@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Project Ryl4x</title>
+        <link rel="icon" href="Cute Bunny.jpg" type="image/jpg">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:opsz,wght@6..144,400..700&display=swap">
+        <link rel="stylesheet" href="style.css">
+        <script src="script.js" defer></script>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+    </head>
+    <body>
+        <nav class="sidebar open">
+            <div class="logo">
+                <div class="logo-group">
+                <img class="logo-image" src="Cute Bunny.jpg" alt="Project logo">
+                <span class="logo-text">Ryl4x</span>
+                </div>
+                <button class="sidebar-toggle" onclick="toggleSidebar()" aria-label="Toggle sidebar">
+                    <img src="sidebarinv.png" alt="">
+                </button>
+            </div>
+            <a href="index.html">Home</a>
+            <a href="aboutus.html">About Us</a>
+            <a href="others.html">Others</a>
+            <a href="tasks.html">Tasks</a>
+            <a href="management.html">Management</a>
+            <a href="settings.html">Settings</a>
+        </nav>
+    
+        <div class="container">
+            <div class="header">
+                <h1>Understand Everything</h1> 
+            </div>
+            <form class="search-form"> 
+                <div class="search-input-container">
+                    <input type="text" id="searchInput" onkeyup="searchFunction()" placeholder="Search to start...">
+                    <button type="submit" class="search-button">Search </button>
+                </div>
+            </form>
+        </div>  
+
+    </body>
+</html>

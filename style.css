@@ -1,0 +1,103 @@
+* {
+    font-family: "Google Sans Flex", sans-serif;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.logo-group{
+    display:flex;
+    align-items:center;
+    gap: 12px
+}
+
+.logo-text {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #fff;
+    transition: opacity 0.2s ease;
+}
+
+.logo-image {
+    width: 30px;
+    height: 30px;
+    object-fit: cover;
+}
+
+.sidebar-toggle {
+      background: transparent;
+      border: none;
+      width: 35px;
+      height: 35px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: 0.2s;
+  }
+
+.sidebar-toggle img {
+      width: 27px;
+      height: 35px;
+      object-fit: contain;
+  }
+
+.sidebar-toggle:hover {
+      background: transparent;
+  }
+
+
+.sidebar {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    width: 250px;
+    background-color: rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(20px);
+    transition: width 0.3s ease;
+    padding-top: 0;
+    z-index: 1000;
+}
+
+.sidebar:not(.open) {
+    width: 30px;
+    background-color: transparent;
+    backdrop-filter: none;
+}
+
+.sidebar.open {
+    width: 250px;
+}
+
+.sidebar:not(.open) .logo-image,
+.sidebar:not(.open) .logo-text,
+.sidebar:not(.open) > a {
+    display: none;
+}
+
+
+.container {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+
+}
+
+.search-input-container {
+    width: 100%;
+    padding: 12px;
+    background: #00000000;
+
+}
