@@ -9,6 +9,122 @@
         <link rel="stylesheet" href="style.css">
         <script src="script.js" defer></script>
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        <style>
+            .db-section {
+                margin-top: 30px;
+                background: #fff;
+                padding: 20px;
+                border-radius: 12px;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            }
+            .db-section h2 {
+                margin-top: 0;
+                font-size: 1.5rem;
+                color: #2563eb;
+            }
+            .db-form {
+                display: flex;
+                gap: 10px;
+                flex-wrap: wrap;
+                margin-bottom: 20px;
+                align-items: flex-end;
+            }
+            .db-form input[type="text"],
+            .db-form textarea {
+                padding: 10px 14px;
+                font-size: 16px;
+                border: 1px solid #ccc;
+                border-radius: 6px;
+                flex: 1;
+                min-width: 200px;
+            }
+            .db-form textarea {
+                resize: vertical;
+                min-height: 44px;
+            }
+            .db-form button {
+                padding: 10px 20px;
+                font-size: 16px;
+                background: #2563eb;
+                color: white;
+                border: none;
+                border-radius: 6px;
+                cursor: pointer;
+            }
+            .db-form button:hover {
+                background: #1d4ed8;
+            }
+            table.db-table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-top: 10px;
+            }
+            table.db-table th,
+            table.db-table td {
+                padding: 12px;
+                text-align: left;
+                border-bottom: 1px solid #eee;
+            }
+            table.db-table th {
+                background: #f5f7fa;
+            }
+            .btn-sm {
+                padding: 6px 12px;
+                font-size: 14px;
+                margin-right: 6px;
+                cursor: pointer;
+                border-radius: 4px;
+                border: none;
+            }
+            .btn-edit {
+                background: #f59e0b;
+                color: #fff;
+            }
+            .btn-delete {
+                background: #ef4444;
+                color: #fff;
+            }
+            .btn-save {
+                background: #10b981;
+                color: #fff;
+            }
+            .btn-cancel {
+                background: #6b7280;
+                color: #fff;
+            }
+            .edit-row {
+                display: none;
+                gap: 6px;
+                align-items: center;
+                margin-top: 8px;
+            }
+            .edit-row input {
+                padding: 6px;
+                font-size: 14px;
+            }
+            .msg {
+                padding: 10px;
+                border-radius: 6px;
+                margin-bottom: 15px;
+                display: none;
+                font-size: 14px;
+            }
+            .msg.success {
+                background: #dcfce7;
+                color: #166534;
+                border: 1px solid #86efac;
+            }
+            .msg.error {
+                background: #fee2e2;
+                color: #991b1b;
+                border: 1px solid #fecaca;
+            }
+            .empty {
+                text-align: center;
+                color: #666;
+                padding: 20px;
+            }
+        </style>
     </head>
     <body>
         <nav class="sidebar open">
@@ -21,12 +137,32 @@
                     <img src="sidebarinv.png" alt="">
                 </button>
             </div>
-            <a href="index.html">Home</a>
-            <a href="aboutus.html">About Us</a>
-            <a href="others.html">Others</a>
-            <a href="tasks.html">Tasks</a>
-            <a href="management.html">Management</a>
-            <a href="settings.html">Settings</a>
+            <nav class="link">
+            <a href="index.html">
+                <img src="home.png" alt="" class="home-icon">
+                Home
+            </a>
+            <a href="aboutus.html">
+                <img src="graduate-hat.png" alt="" class="about-icon">    
+                About Us
+            </a>
+            <a href="others.html">
+                <img src="user.png" alt="" class="user-icon">
+                Others
+            </a>
+            <a href="tests.html">
+                <img src="test.png" alt="" class="test-icon">
+                Tests
+            </a>
+            <a href="management.html">
+                <img src="calendar.png" alt="" class="calendar-icon">
+                Management
+            </a>
+            <a href="settings.html">
+                <img src="settings.png" alt="" class="settings-icon">
+                Settings
+            </a>
+            </nav>
         </nav>
     
         <div class="container">
@@ -36,10 +172,160 @@
             <form class="search-form"> 
                 <div class="search-input-container">
                     <input type="text" id="searchInput" onkeyup="searchFunction()" placeholder="Search to start...">
-                    <button type="submit" class="search-button">Search </button>
+                    <button type="submit" class="search-button">
+                        <img src="send.png" alt="" class="send-icon">
+                    </button>
                 </div>
             </form>
+
+            <div class="db-section">
+                <h2>🗄️ Database Items</h2>
+                <div id="dbMessage" class="msg"></div>
+                
+                <form id="dbAddForm" class="db-form" hidden>
+                    <input type="text" id="dbTitle" placeholder="Item title" required />
+                    <textarea id="dbDesc" placeholder="Description (optional)" rows="1"></textarea>
+                    <button type="submit">Add Item</button>
+                </form>
+
+                <table class="db-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Title</th>
+                            <th>Description</th>
+                            <th>Created</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="dbList">
+                        <tr><td colspan="5" class="empty">Loading...</td></tr>
+                    </tbody>
+                </table>
+            </div>
         </div>  
 
+        <script>
+            const API = 'http://localhost:3000/api/items';
+            const dbMessage = document.getElementById('dbMessage');
+            const dbAddForm = document.getElementById('dbAddForm');
+            const dbTitle = document.getElementById('dbTitle');
+            const dbDesc = document.getElementById('dbDesc');
+            const dbList = document.getElementById('dbList');
+
+            function showDbMsg(text, type = 'success') {
+                dbMessage.textContent = text;
+                dbMessage.className = 'msg ' + type;
+                dbMessage.style.display = 'block';
+                setTimeout(() => { dbMessage.style.display = 'none'; }, 4000);
+            }
+
+            async function loadDbItems() {
+                try {
+                    const res = await fetch(API);
+                    const data = await res.json();
+                    renderDbItems(data.data || []);
+                } catch (err) {
+                    dbList.innerHTML = '<tr><td colspan="5" class="empty">Error loading. Is the server running?</td></tr>';
+                }
+            }
+
+            function escapeHtml(text) {
+                if (!text) return '';
+                const d = document.createElement('div');
+                d.textContent = text;
+                return d.innerHTML;
+            }
+
+            function renderDbItems(items) {
+                dbList.innerHTML = '';
+                if (items.length === 0) {
+                    dbList.innerHTML = '<tr><td colspan="5" class="empty">No items yet.</td></tr>';
+                    return;
+                }
+                items.forEach(item => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td><strong>#${item.id}</strong></td>
+                        <td id="db-title-${item.id}">${escapeHtml(item.title)}</td>
+                        <td id="db-desc-${item.id}">${escapeHtml(item.description || '')}</td>
+                        <td>${item.created_at ? item.created_at.slice(0,16) : '-'}</td>
+                        <td>
+                            <button class="btn-sm btn-edit" onclick="startDbEdit(${item.id})">Edit</button>
+                            <button class="btn-sm btn-delete" onclick="deleteDbItem(${item.id})">Delete</button>
+                            <div class="edit-row" id="db-edit-${item.id}">
+                                <input type="text" id="db-edit-title-${item.id}" value="${escapeHtml(item.title)}" />
+                                <input type="text" id="db-edit-desc-${item.id}" value="${escapeHtml(item.description || '')}" />
+                                <button class="btn-sm btn-save" onclick="saveDbEdit(${item.id})">Save</button>
+                                <button class="btn-sm btn-cancel" onclick="cancelDbEdit(${item.id})">Cancel</button>
+                            </div>
+                        </td>
+                    `;
+                    dbList.appendChild(tr);
+                });
+            }
+
+            dbAddForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const title = dbTitle.value.trim();
+                const description = dbDesc.value.trim();
+                try {
+                    const res = await fetch(API, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ title, description })
+                    });
+                    const data = await res.json();
+                    if (res.ok) {
+                        showDbMsg('Item added!');
+                        dbTitle.value = '';
+                        dbDesc.value = '';
+                        loadDbItems();
+                    } else {
+                        showDbMsg(data.error || 'Failed', 'error');
+                    }
+                } catch (err) {
+                    showDbMsg('Server error', 'error');
+                }
+            });
+
+            window.startDbEdit = function(id) {
+                document.getElementById('db-edit-' + id).style.display = 'flex';
+            };
+            window.cancelDbEdit = function(id) {
+                document.getElementById('db-edit-' + id).style.display = 'none';
+            };
+            window.saveDbEdit = async function(id) {
+                const title = document.getElementById('db-edit-title-' + id).value.trim();
+                const description = document.getElementById('db-edit-desc-' + id).value.trim();
+                try {
+                    const res = await fetch(`${API}/${id}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ title, description })
+                    });
+                    if (res.ok) {
+                        showDbMsg('Item updated!');
+                        loadDbItems();
+                    }
+                } catch (err) {
+                    showDbMsg('Update failed', 'error');
+                }
+            };
+            window.deleteDbItem = async function(id) {
+                if (!confirm('Delete this item?')) return;
+                try {
+                    const res = await fetch(`${API}/${id}`, { method: 'DELETE' });
+                    if (res.ok) {
+                        showDbMsg('Item deleted!');
+                        loadDbItems();
+                    }
+                } catch (err) {
+                    showDbMsg('Delete failed', 'error');
+                }
+            };
+
+            loadDbItems();
+        </script>
     </body>
 </html>
